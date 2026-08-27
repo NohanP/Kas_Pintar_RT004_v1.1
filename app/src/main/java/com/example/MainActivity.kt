@@ -301,6 +301,7 @@ fun KasRtApp(
                         selectedYear = selectedYear,
                         searchQuery = pettyCashSearchQuery,
                         selectedTypeFilter = pettyCashTypeFilter,
+                        canRecord = currentRole.canRecordTransaction,
                         onSearchChange = { viewModel.setPettyCashSearchQuery(it) },
                         onTypeFilterChange = { viewModel.setPettyCashTypeFilter(it) },
                         onPeriodClick = { viewModel.showPeriodPickerDialog.value = true },

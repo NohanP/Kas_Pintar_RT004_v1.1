@@ -438,6 +438,7 @@ class RtCashViewModel(application: Application) : AndroidViewModel(application) 
         proofPhotoDescription: String? = null,
         context: android.content.Context? = null
     ) {
+        if (!_currentRole.value.canRecordTransaction) return
         viewModelScope.launch {
             val count = filteredPettyCashTransactions.value.count { it.type == TransactionType.PENGELUARAN } + 1
             val effectiveBpkk = bpkkNumber.ifBlank { "BPKK-$year${String.format(Locale.US, "%02d", month)}-${String.format(Locale.US, "%03d", count)}" }
@@ -476,6 +477,7 @@ class RtCashViewModel(application: Application) : AndroidViewModel(application) 
         month: Int = _selectedMonth.value,
         year: Int = _selectedYear.value
     ) {
+        if (!_currentRole.value.canRecordTransaction) return
         viewModelScope.launch {
             val count = filteredPettyCashTransactions.value.count { it.type == TransactionType.PEMASUKAN } + 1
             val effectiveBpkk = "KK-IN-${year}${String.format("%02d", month)}-${String.format("%03d", count)}"
@@ -521,6 +523,7 @@ class RtCashViewModel(application: Application) : AndroidViewModel(application) 
         proofPhotoDescription: String? = null,
         context: android.content.Context? = null
     ) {
+        if (!_currentRole.value.canRecordTransaction) return
         viewModelScope.launch {
             val prefix = if (type == TransactionType.PEMASUKAN) "KW-IN" else "EXP-OUT"
             val receiptNum = "$prefix-${year}${String.format("%02d", month)}-${System.currentTimeMillis().toString().takeLast(5)}"
@@ -553,6 +556,7 @@ class RtCashViewModel(application: Application) : AndroidViewModel(application) 
         proofPhotoUri: android.net.Uri? = null,
         context: android.content.Context? = null
     ) {
+        if (!_currentRole.value.canRecordTransaction) return
         viewModelScope.launch {
             repository.updateTransaction(transaction, selectedImageUri = proofPhotoUri, context = context)
             selectedTransactionForEdit.value = null
@@ -560,12 +564,14 @@ class RtCashViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun deleteTransaction(transaction: TransactionEntity) {
+        if (!_currentRole.value.canRecordTransaction) return
         viewModelScope.launch {
             repository.deleteTransaction(transaction)
         }
     }
 
     fun quickMarkCitizenPaid(citizen: CitizenEntity, paymentMethod: PaymentMethod = PaymentMethod.TUNAI) {
+        if (!_currentRole.value.canRecordTransaction) return
         viewModelScope.launch {
             repository.payCitizenDues(
                 citizen = citizen,

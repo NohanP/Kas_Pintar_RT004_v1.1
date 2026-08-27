@@ -84,6 +84,7 @@ fun PettyCashScreen(
     selectedYear: Int,
     searchQuery: String,
     selectedTypeFilter: TransactionType?,
+    canRecord: Boolean = false,
     onSearchChange: (String) -> Unit,
     onTypeFilterChange: (TransactionType?) -> Unit,
     onPeriodClick: () -> Unit,
@@ -183,59 +184,79 @@ fun PettyCashScreen(
         }
 
         // 3. Quick Action Buttons Bar
-        item {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
+        if (canRecord) {
+            item {
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Button(
-                        onClick = onAddExpenseClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(46.dp)
-                            .testTag("btn_add_petty_cash_expense"),
-                        shape = RoundedCornerShape(12.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = ExpenseRed)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.Receipt, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Catat Pengeluaran", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        Button(
+                            onClick = onAddExpenseClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(46.dp)
+                                .testTag("btn_add_petty_cash_expense"),
+                            shape = RoundedCornerShape(12.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = ExpenseRed)
+                        ) {
+                            Icon(Icons.Default.Receipt, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Catat Pengeluaran", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        }
+
+                        Button(
+                            onClick = onTopUpClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(46.dp)
+                                .testTag("btn_top_up_petty_cash"),
+                            shape = RoundedCornerShape(12.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
+                        ) {
+                            Icon(Icons.Default.AddCircle, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Top Up Kas", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        }
                     }
 
-                    Button(
-                        onClick = onTopUpClick,
+                    OutlinedButton(
+                        onClick = onShareReportClick,
                         modifier = Modifier
-                            .weight(1f)
-                            .height(46.dp)
-                            .testTag("btn_top_up_petty_cash"),
+                            .fillMaxWidth()
+                            .height(44.dp)
+                            .testTag("btn_petty_cash_report"),
                         shape = RoundedCornerShape(12.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        border = BorderStroke(1.dp, EmeraldPrimary.copy(alpha = 0.7f))
                     ) {
-                        Icon(Icons.Default.AddCircle, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Assessment, contentDescription = null, modifier = Modifier.size(18.dp), tint = EmeraldPrimary)
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Top Up Kas", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        Text("Laporan & Rekapitulasi Kas Kecil", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = EmeraldPrimary, maxLines = 1)
                     }
                 }
-
+            }
+        } else {
+            // View Only mode can still share report but maybe differently or just simpler
+            item {
                 OutlinedButton(
                     onClick = onShareReportClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
-                        .testTag("btn_petty_cash_report"),
+                        .testTag("btn_petty_cash_report_view_only"),
                     shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     border = BorderStroke(1.dp, EmeraldPrimary.copy(alpha = 0.7f))
                 ) {
                     Icon(Icons.Default.Assessment, contentDescription = null, modifier = Modifier.size(18.dp), tint = EmeraldPrimary)
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Laporan & Rekapitulasi Kas Kecil", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = EmeraldPrimary, maxLines = 1)
+                    Text("Bagikan Laporan Kas Kecil", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = EmeraldPrimary, maxLines = 1)
                 }
             }
         }
@@ -438,6 +459,7 @@ fun PettyCashScreen(
             items(transactions, key = { it.id }) { tx ->
                 PettyCashTransactionItem(
                     transaction = tx,
+                    canEdit = canRecord,
                     onViewVoucher = { onViewVoucherClick(tx) },
                     onEdit = { onEditTransactionClick(tx) },
                     onDelete = { onDeleteTransactionClick(tx) },
@@ -544,6 +566,7 @@ private fun CategoryProgressRow(cat: CategoryBreakdown) {
 @Composable
 private fun PettyCashTransactionItem(
     transaction: TransactionEntity,
+    canEdit: Boolean,
     onViewVoucher: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -725,22 +748,24 @@ private fun PettyCashTransactionItem(
                                     onViewVoucher()
                                 }
                             )
-                            DropdownMenuItem(
-                                text = { Text("Edit Transaksi", fontSize = 12.5.sp) },
-                                leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onEdit()
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Hapus Transaksi", fontSize = 12.5.sp, color = ExpenseRed) },
-                                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = ExpenseRed, modifier = Modifier.size(16.dp)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onDelete()
-                                }
-                            )
+                            if (canEdit) {
+                                DropdownMenuItem(
+                                    text = { Text("Edit Transaksi", fontSize = 12.5.sp) },
+                                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onEdit()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Hapus Transaksi", fontSize = 12.5.sp, color = ExpenseRed) },
+                                    leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = ExpenseRed, modifier = Modifier.size(16.dp)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        onDelete()
+                                    }
+                                )
+                            }
                         }
                     }
                 }
