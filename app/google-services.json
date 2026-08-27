@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "717691092767",
+    "project_id": "kas-pintar-rt004",
+    "storage_bucket": "kas-pintar-rt004.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717691092767:android:7399b6e4a729af5a377a2a",
+        "android_client_info": {
+          "package_name": "com.aistudio.kasrt.xkzpqm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3Non2gT3edIXLPEPG5puX6fu0uDPBasE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
