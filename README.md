@@ -1,4 +1,4 @@
-# Kas-Pintar-RT004_v1.0
+# Kas_Pintar_RT004_v1.1
 
 An Android-based operational and financial tracking application designed for local community administrators (Pengurus RT) to ensure transparency, automate transaction logging, and eliminate manual bookkeeping bottlenecks[cite: 2].
 
